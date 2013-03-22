@@ -13,5 +13,5 @@ plenv_run "install plenv" do
 end
 plenv_perl "5.16" do
   user "test"
-  version "perl-5.16.2"
+  version "5.16.2"
 end

@@ -8,21 +8,26 @@ action :install do
   bash "Install plenv perl #{new_resource.name}" do
     code <<-EOF
     su - #{new_resource.user} -c "#{new_resource.root_dir}/bin/plenv install #{new_resource.version}"
-    su - #{new_resource.user} -c "#{new_resource.root_dir}/bin/plenv install-cpanm #{new_resource.version}"
     EOF
-    not_if {(::File.exists?("#{new_resource.root_dir}/versions/#{new_resource.name}/bin/perl"))}
+    not_if { ::File.exists?("#{new_resource.root_dir}/versions/#{new_resource.version}/bin/perl") }
   end
 
-  if %w( global local ).include?(new_resource.using)
-    bash "apply perl version" do
-      user new_resource.user
-      environment ({
-        'PLENV_ROOT' => new_resource.root_dir,
-        'PLENV_HOME' => new_resource.root_dir,
-      })
-      code <<-EOC
-      echo #{new_resource.name} > #{new_resource.root_dir}/version
-      EOC
-    end
+  bash "apply perl version" do
+    user new_resource.user
+    environment ({
+      'PLENV_ROOT' => new_resource.root_dir,
+      'PLENV_HOME' => new_resource.root_dir,
+    })
+    code <<-EOC
+    echo #{new_resource.name} > #{new_resource.root_dir}/version
+    EOC
+  end
+
+  bash "Install plenv-cpanm" do
+    code <<-EOF
+    su - #{new_resource.user} -c "#{new_resource.root_dir}/bin/plenv install-cpanm"
+    su - #{new_resource.user} -c "#{new_resource.root_dir}/bin/plenv rehash"
+    EOF
+    not_if { ::File.exists?("#{new_resource.root_dir}/versions/#{new_resource.version}/bin/cpanm") }
   end
 end
