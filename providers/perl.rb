@@ -19,7 +19,7 @@ action :install do
       'PLENV_HOME' => new_resource.root_dir,
     })
     code <<-EOC
-    echo #{new_resource.name} > #{new_resource.root_dir}/version
+    echo #{new_resource.version} > #{new_resource.root_dir}/version
     EOC
   end
 
